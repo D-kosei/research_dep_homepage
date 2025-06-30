@@ -92,10 +92,10 @@ function updateObstacles() {
 
     // プレイヤーとの衝突判定
     if (
-      player.x < ob.x + ob.size &&
-      player.x + player.width > ob.x &&
-      player.y < ob.y + ob.size &&
-      player.y + player.height > ob.y
+    player.x < ob.x + ob.size * 0.5 &&
+    player.x + player.width > ob.x - ob.size * 0.5 &&
+    player.y < ob.y + ob.size * 0.5 &&
+    player.y + player.height > ob.y - ob.size * 0.5
     ) {
       gameState = "over";
     }
@@ -111,8 +111,8 @@ function updateObstacles() {
 function checkSpikeCollision(player) {
   for (const pf of platforms) {
     if (pf.hasSpike) {
-      const spikeW = 40;
-    const spikeH = 40;
+      const spikeW = 30;
+    const spikeH = 30;
     const spikeX = pf.x + platformWidth / 2 - spikeW / 2;
     const spikeY = pf.y - spikeH;
       if (
