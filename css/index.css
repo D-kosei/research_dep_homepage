@@ -1,12 +1,12 @@
 /* 全体 */
 body {
   margin: 0;
-  background: #fff
+  background: radial-gradient(#a3bae2, #3271dd);
 }
 
 /* フレーム */
 .frame {
-  margin: 100px auto;
+  margin: 70px auto;
   width: 800px;
   border: 10px solid #0930ae;
   border-radius: 8px;
@@ -14,16 +14,20 @@ body {
 
 /* ボード */
 .board {
-  background: radial-gradient(#a3bae2, #3271dd);
-  padding: 30px 20px 60px 20px;
+  background-color: #fff;
+  padding: 30px 20px;
   min-height: 480px;
+  background-image: url("../img/tyari.png");
+  background-size: 40% auto;      /* 画像をボード内に収める */
+  background-repeat: no-repeat;  /* 画像の繰り返しなし */
+  background-position: bottom right;   /* 画像を中央に配置 */
 }
 
 /* タイトル */
 .title{
-  font-family: serif;
+  font-family: sans-serif;
   font-size: 80px;
-  font-weight: 700px;
+  font-weight: 1000;
   color: #000;
   letter-spacing: 0.1em;
   text-shadow: 2px 3px 0 #86b0f8;
