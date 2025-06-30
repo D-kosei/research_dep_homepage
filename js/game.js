@@ -4,11 +4,12 @@ const ctx = canvas.getContext("2d");
 
 // ===== ゲーム定数 =====
 const GRAVITY = 0.5;                      // 重力加速度
-const JUMP_STRENGTH = -10;               // ジャンプ時の初速度
+const JUMP_STRENGTH = -12;               // ジャンプ時の初速度
 const BASE_SCROLL_SPEED = 3;             // 通常の横スクロール速度
 let scrollSpeed = BASE_SCROLL_SPEED;     // 現在のスクロール速度（加速対応）
 
 // ===== ゲーム状態管理 =====
+let playStartTime = 0;                    // ゲーム開始時刻（ミリ秒）
 let gameState = "start";                 // "start" | "play" | "over"
 let score = 0;                            // スコアカウント
 let showStartText = false;               // 「スタート！」表示のフラグ
@@ -18,35 +19,65 @@ let boostFrames = 0;                     // 加速持続フレーム（Shiftキ�
 // ===== プレイヤーオブジェクト =====
 const player = {
   x: 100,
-  y: 280,
-  width: 30,
-  height: 30,
-  vy: 0,                // Y方向速度
-  onGround: true,       // 地面にいるか
-  canDoubleJump: true   // 2段ジャンプ可能か
-};
+  y: canvas.height - 140, // 足場の上に設置
+  width: 60,
+  height: 60,
+  vy: 0,
+  onGround: true,
+  canDoubleJump: true
+};;
 
 // ===== 足場・障害物の管理 =====
 const platforms = [];
 const obstacles = [];
-const platformWidth = 100;
-const platformHeight = 20;
+const platformWidth = 200;
+const platformHeight = 40;
 
 // 初期足場の生成
 function initPlatforms() {
   platforms.length = 0;
+  const groundY = canvas.height - 100;
   for (let i = 0; i < 8; i++) {
-    platforms.push({ x: i * platformWidth, y: 310 });
+    platforms.push({
+      x: i * platformWidth,
+      y: groundY,
+      hasSpike: false
+    });
   }
 }
 
+// 足場の再生成（無限生成）
+function regeneratePlatforms() {
+  if (platforms[0].x + platformWidth < 0) {
+    platforms.shift();
+    const lastX = platforms[platforms.length - 1].x;
+    const gap = Math.random() < 0.3 ? 60 : 0;
+    const groundY = canvas.height - 100;
+    const newY = groundY + (Math.random() < 0.2 ? -60 : 0);
+    const now = Date.now();
+    const elapsed = now - playStartTime;
+    platforms.push({
+      x: lastX + platformWidth + gap,
+      y: newY,
+      hasSpike: elapsed >= 5000 ? Math.random() < 0.3 : false
+    });
+    score++;
+  }
+};
+    score++;
+
+    score++;
+  
+
+
 // ランダムに隕石（障害物）を生成
 function spawnObstacle() {
-  if (Math.random() < 0.02) {
+  // 出現確率
+  if (Math.random() < 0.01) {
     obstacles.push({
       x: canvas.width,
-      y: -20,
-      size: 20,
+      y: -40,
+      size: 40,
       vy: 1 + Math.random() * 0.5
     });
   }
@@ -76,20 +107,55 @@ function updateObstacles() {
   }
 }
 
+// スパイク（三角形）との当たり判定（接触でゲームオーバー）
+function checkSpikeCollision(player) {
+  for (const pf of platforms) {
+    if (pf.hasSpike) {
+      const spikeW = 40;
+    const spikeH = 40;
+    const spikeX = pf.x + platformWidth / 2 - spikeW / 2;
+    const spikeY = pf.y - spikeH;
+      if (
+        player.x < spikeX + spikeW &&
+        player.x + player.width > spikeX &&
+        player.y < spikeY + spikeH &&
+        player.y + player.height > spikeY
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// スパイク（三角形）の描画処理
+function drawSpikes() {
+  ctx.fillStyle = "black";
+  for (const pf of platforms) {
+    if (pf.hasSpike) {
+      const centerX = pf.x + platformWidth / 2;
+      const topY = pf.y;
+      ctx.beginPath();
+      ctx.moveTo(centerX, topY - 20);
+      ctx.lineTo(centerX - 10, topY);
+      ctx.lineTo(centerX + 10, topY);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+
 // ===== ゲーム状態更新処理 =====
 function update() {
   if (gameState !== "play") return;
 
-  // 一時的加速処理（Shift押下時のみ）
   scrollSpeed = boostFrames > 0 ? BASE_SCROLL_SPEED + 2 : BASE_SCROLL_SPEED;
   if (boostFrames > 0) boostFrames--;
 
-  // 重力適用・位置更新
   player.vy += GRAVITY;
   player.y += player.vy;
   player.onGround = false;
 
-  // 足場との接触判定
   for (const pf of platforms) {
     if (
       player.x + player.width > pf.x &&
@@ -104,25 +170,18 @@ function update() {
     }
   }
 
-  // 足場スクロール
   for (const pf of platforms) {
     pf.x -= scrollSpeed;
   }
 
-  // 足場の再生成（無限生成）
-  if (platforms[0].x + platformWidth < 0) {
-    platforms.shift();
-    const lastX = platforms[platforms.length - 1].x;
-    const gap = Math.random() < 0.3 ? 60 : 0;
-    const newY = 310 + (Math.random() < 0.2 ? -30 : 0);
-    platforms.push({ x: lastX + platformWidth + gap, y: newY });
-    score++;
-  }
-
+  regeneratePlatforms();
   spawnObstacle();
   updateObstacles();
 
-  // 落下判定
+  if (checkSpikeCollision(player)) {
+    gameState = "over";
+  }
+
   if (player.y > canvas.height) {
     gameState = "over";
   }
@@ -142,7 +201,10 @@ function draw() {
     ctx.fillRect(pf.x, pf.y, platformWidth, platformHeight);
   }
 
-  // 障害物
+  // スパイク（三角形）を描画
+  drawSpikes();
+
+  // 隕石（丸型障害物）
   ctx.fillStyle = "gray";
   for (const ob of obstacles) {
     ctx.beginPath();
@@ -162,7 +224,6 @@ function draw() {
     ctx.fillText("ゲームオーバー！スペースキーで再挑戦", 150, 180);
   }
 
-  // スタート演出表示
   if (showStartText && startTextTimer > 0) {
     ctx.fillStyle = "yellow";
     ctx.font = "30px sans-serif";
@@ -185,6 +246,7 @@ function gameLoop() {
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     if (gameState === "start" || gameState === "over") {
+    playStartTime = Date.now();
       gameState = "play";
       player.y = 280;
       player.vy = 0;
@@ -201,10 +263,16 @@ document.addEventListener("keydown", (e) => {
       player.canDoubleJump = false;
     }
   } else if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
-    boostFrames = 15; // Shiftを押した瞬間、一定フレームだけ加速
+    boostFrames = 15;
   }
 });
 
 // ===== 初期化とゲーム開始 =====
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 initPlatforms();
 gameLoop();
