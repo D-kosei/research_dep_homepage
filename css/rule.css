@@ -48,3 +48,31 @@ ul {
 .back-btn:hover {
     background-color: #34495e;
 }
+/* メッセージ部分を大きく・目立たせる */
+.message {
+    text-align: center;
+    margin-top: 2em;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2980b9;
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+}
+
+/* ulの余白調整でバランスを良くする */
+ul {
+    font-size: 1.1em;
+    line-height: 1.7;
+    margin-bottom: 2em;
+    padding-left: 1.2em;
+}
+
+/* containerのpadding調整で全体バランスを調整 */
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 40px 28px 32px 28px; /* 上下左右の余白を微調整 */
+}
