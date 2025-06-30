@@ -1,4 +1,4 @@
-/* ページ全体のスタイル */
+/* ページ全体の基本スタイル */
 body {
   margin: 0;
   overflow: hidden;
@@ -8,9 +8,9 @@ body {
   text-align: center;
 }
 
-/* ゲームのキャンバス（中央に配置、背景は空風グラデ） */
+/* ゲーム画面用キャンバスのスタイル */
 #gameCanvas {
   display: block;
   margin: auto;
-  background: linear-gradient(#87ceeb, #fff); /* 空のグラデーション */
+  background: linear-gradient(#87ceeb, #fff); /* 空のグラデーション風背景 */
 }
