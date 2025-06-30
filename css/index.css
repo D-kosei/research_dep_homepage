@@ -1,25 +1,33 @@
+/* 全体 */
 body {
   margin: 0;
-  background: #000000
+  background: radial-gradient(#a3bae2, #3271dd);
 }
 
+/* フレーム */
 .frame {
-  margin: 100px auto;
+  margin: 70px auto;
   width: 800px;
   border: 10px solid #0930ae;
   border-radius: 8px;
 }
 
+/* ボード */
 .board {
-  background: radial-gradient(#a3bae2, #3271dd);
-  padding: 30px 20px 60px 20px;
+  background-color: #fff;
+  padding: 30px 20px;
   min-height: 480px;
+  background-image: url("../img/tyari.png");
+  background-size: 40% auto;      /* 画像をボード内に収める */
+  background-repeat: no-repeat;  /* 画像の繰り返しなし */
+  background-position: bottom right;   /* 画像を中央に配置 */
 }
 
+/* タイトル */
 .title{
-  font-family: serif;
+  font-family: sans-serif;
   font-size: 80px;
-  font-weight: 700px;
+  font-weight: 1000;
   color: #000;
   letter-spacing: 0.1em;
   text-shadow: 2px 3px 0 #86b0f8;
@@ -27,7 +35,7 @@ body {
   margin-bottom: 50px;
 }
 
-/* Buttons */
+/* ボタン全体 */
 .buttons {
   display: flex;
   flex-direction: column;
@@ -37,6 +45,7 @@ body {
   margin-bottom: 16px;
 }
 
+/* ボタン */
 button {
   width: 170px;
   font-size: 28px;
@@ -53,25 +62,13 @@ button {
   font-weight: 700;
   background: #fff6e1;
 }
-.howto {
+.howTo {
   color: #222;
   font-weight: 700;
   background: #fffef8;
 }
-.settings {
-  color: #2d5226;
-  font-size: 700;
+.setting {
+  color: #206312;
+  font-weight: 700;
   background: #f8ffe7;
-}
-
-/* WebGL version */
-.webgl {
-  position: absolute;
-  right: 20px; bottom: 12px;
-  font-size: 18px;
-  color: #422;
-  font-family: serif;
-}
-.ver {
-  font-size: 15px;
 }
