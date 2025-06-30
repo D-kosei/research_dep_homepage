@@ -3,12 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>チャリ走風ゲーム</title>
-  <!-- CSSファイルの読み込み（新構造: css/style.css） -->
+  <!-- CSSファイルの読み込み -->
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+    }
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      max-width: 960px;
+      max-height: 540px;
+    }
+  </style>
 </head>
 <body>
   <!-- ゲーム描画用のキャンバス -->
-  <canvas id="gameCanvas" width="640" height="360"></canvas>
+  <canvas id="gameCanvas" width="960" height="540"></canvas>
   <!-- JavaScriptファイルの読み込み（新構造: js/game.js） -->
   <script src="js/game.js"></script>
 </body>
