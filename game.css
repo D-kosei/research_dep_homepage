@@ -1,0 +1,16 @@
+/* ページ全体のスタイル */
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+  color: white;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+/* ゲームのキャンバス（中央に配置、背景は空風グラデ） */
+#gameCanvas {
+  display: block;
+  margin: auto;
+  background: linear-gradient(#87ceeb, #fff); /* 空のグラデーション */
+}
