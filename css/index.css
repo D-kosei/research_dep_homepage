@@ -54,6 +54,9 @@ body {
   gap: 35px;          /* 必要に応じて調整 */
   width: 600px;
   margin: 0 auto 30px auto;
+
+  position: relative;
+  z-index: 2;
 }
 
 .buttons a {
