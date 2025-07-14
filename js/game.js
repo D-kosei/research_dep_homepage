@@ -35,10 +35,10 @@ const bgm = new Audio("bgm/bgm.mp3");      // 背景音楽（ループ）
 bgm.loop = true;
 
 // ===== ゲーム定数 =====
-const GRAVITY = 0.5;                      // 重力加速度
-const JUMP_STRENGTH = -12;               // ジャンプ時の初速度
-const BASE_SCROLL_SPEED = 3;             // 通常の横スクロール速度
-let scrollSpeed = BASE_SCROLL_SPEED;     // 現在のスクロール速度（加速対応）
+const GRAVITY = 0.5;            // 重力加速度
+const JUMP_STRENGTH = -12;      // ジャンプ時の初速度
+const BASE_SCROLL_SPEED = 3;    // 通常の横スクロール速度
+let scrollSpeed = BASE_SCROLL_SPEED; // 現在のスクロール速度（加速対応）
 
 // キャラクター画像のパスを設定
 function getCharacterImagePath() {
@@ -60,12 +60,12 @@ let characterImg = new Image();
 characterImg.src = getCharacterImagePath();
 
 // ===== ゲーム状態管理 =====
-let playStartTime = 0;                    // ゲーム開始時刻（ミリ秒）
-let gameState = "start";                 // "start" | "play" | "over"
-let score = 0;                            // スコアカウント
-let showStartText = false;               // 「スタート！」表示のフラグ
-let startTextTimer = 0;                  // 表示タイマー
-let boostFrames = 0;                     // 加速持続フレーム（Shiftキー）
+let playStartTime = 0;          // ゲーム開始時刻（ミリ秒）
+let gameState = "start";        // "start" | "play" | "over"
+let score = 0;                  // スコア
+let showStartText = false;      // 「スタート！」表示フラグ
+let startTextTimer = 0;         // 表示タイマー
+let boostFrames = 0;            // 加速持続フレーム
 
 // ===== プレイヤーオブジェクト =====
 const player = {
@@ -102,7 +102,7 @@ function regeneratePlatforms() {
   if (platforms[0].x + platformWidth < 0) {//今いる足場が画面から出たら
     platforms.shift();//配列の最初をなくす、使わなくなった足場のデータを消す
     const lastX = platforms[platforms.length - 1].x;//今生成されている足場の一番右のｘ座標を取得
-    const gap = Math.random() < 0.3 ? 150 : 0;//足場に穴を作るかどうか
+    const gap = Math.random() < 0.3 ? 100 : 0;//足場に穴を作るかどうか
     const groundY = canvas.height - 100;//画面の下から100px上の場所に足場を配置する
     const newY = groundY + (Math.random() < 0.2 ? -60 : 0);
     const now = Date.now();//現在の時刻
@@ -115,8 +115,6 @@ function regeneratePlatforms() {
     score++;
   }
 };
-
-
 
 // ランダムに隕石（障害物）を生成
 function spawnObstacle() {
@@ -142,7 +140,6 @@ function updateObstacles() {
     const ob = obstacles[i];
     ob.y += ob.vy + fallSpeedUp;;
     ob.x -= scrollSpeed;
-
     // プレイヤーとの衝突判定
     if (
     player.x + player.width * 0.3 < ob.x + ob.size * 0.4 &&
@@ -166,10 +163,10 @@ function updateObstacles() {
 function checkSpikeCollision(player) {
   for (const pf of platforms) {
     if (pf.hasSpike) {
-      const spikeW = 30;
-    const spikeH = 30;
-    const spikeX = pf.x + platformWidth / 2 - spikeW / 2;
-    const spikeY = pf.y - spikeH;
+       const spikeW = 30;
+      const spikeH = 30;
+      const spikeX = pf.x + platformWidth / 2 - spikeW / 2;
+      const spikeY = pf.y - spikeH;
       if (
         player.x < spikeX + spikeW &&
         player.x + player.width > spikeX &&
@@ -183,7 +180,7 @@ function checkSpikeCollision(player) {
   return false;
 }
 
-// スパイク（三角形）の描画処理
+// ===== スパイク描画 =====
 function drawSpikes() {
   ctx.fillStyle = "black";
   for (const pf of platforms) {
@@ -199,6 +196,7 @@ function drawSpikes() {
     }
   }
 }
+
 
 // ===== ゲーム状態更新処理 =====
 function update() {
@@ -269,7 +267,6 @@ function update() {
   }
 }
 
-
 // ===== 描画処理 =====
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -279,6 +276,7 @@ function draw() {
   let drawH = player.height;
   let offsetY = 0;
   const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
+
   // 大きさの調整
   if (settings.character && settings.character === "horse") {
     drawW = player.width * 1.3;
@@ -303,7 +301,6 @@ function draw() {
     ctx.fillRect(player.x, player.y, player.width, player.height);
   }
 
-
   // 足場
   ctx.fillStyle = "green";
   for (const pf of platforms) {
@@ -327,18 +324,27 @@ function draw() {
   ctx.fillText(`Score: ${score}`, 10, 30);
 
   // 状態メッセージ
+  ctx.font = "28px sans-serif";
   ctx.textAlign = "center"; // 中央揃え
   if (gameState === "start") {
-    ctx.fillText("スペースキーでスタート", canvas.width / 2 , canvas.height / 2);
+    ctx.fillText(
+      isMobile() ? "ジャンプボタンでスタート" : "スペースキーでスタート",
+      canvas.width / 2, canvas.height / 2
+    );
   } else if (gameState === "over") {
-    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", canvas.width / 2 , canvas.height / 2);
+    ctx.fillText(
+      isMobile() ? "ゲームオーバー！ジャンプボタンで再挑戦" : "ゲームオーバー！スペースキーで再挑戦",
+      canvas.width / 2, canvas.height / 2
+    );
   }
-  ctx.textAlign = "left"; // スコアは左揃え
+  ctx.textAlign = "start"; // 描画後に戻す
 
   if (showStartText && startTextTimer > 0) {
     ctx.fillStyle = "yellow";
     ctx.font = "30px sans-serif";
-    ctx.fillText("スタート！", canvas.width / 2 - 60, canvas.height / 2);
+    ctx.textAlign = "center";
+    ctx.fillText("スタート！", canvas.width / 2, canvas.height / 2);
+    ctx.textAlign = "start";
     startTextTimer--;
     if (startTextTimer <= 0) {
       showStartText = false;
@@ -346,40 +352,46 @@ function draw() {
   }
 }
 
-// ===== メインループ処理 =====
+// ===== メインループ =====
 function gameLoop() {
   update();
   draw();
   requestAnimationFrame(gameLoop);
 }
 
+// ===== ゲームリセット =====
+function resetGame() {
+  // キャラクター画像を再設定
+  characterImg.src = getCharacterImagePath();
+
+  // ゲーム初期化処理
+  playStartTime = Date.now();
+  gameState = "play";
+  player.y = canvas.height - 100 - player.height;
+  player.vy = 0;
+  player.canDoubleJump = true;
+  score = 0;
+  obstacles.length = 0;
+  showStartText = true;
+  startTextTimer = 60;
+  initPlatforms();
+
+  // ここでBGMのON/OFF判定
+  const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
+  if (settings.bgm === "on") {
+    bgm.currentTime = 0;
+    bgm.play();
+  } else {
+    bgm.pause();
+    bgm.currentTime = 0;
+  }
+}
+
 // ===== キー入力処理 =====
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     if (gameState === "start" || gameState === "over") {
-      // キャラクター画像を再設定
-      characterImg.src = getCharacterImagePath();
-      // ゲーム初期化処理
-      playStartTime = Date.now();
-      gameState = "play";
-      player.y = canvas.height - 100 - player.height;
-      player.vy = 0;
-      player.canDoubleJump = true;
-      score = 0;
-      obstacles.length = 0;
-      showStartText = true;
-      startTextTimer = 60;
-      initPlatforms();
-
-      // ここでBGMのON/OFF判定
-      const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
-      if (settings.bgm === "on") {
-        bgm.currentTime = 0;
-        bgm.play();
-      } else {
-        bgm.pause();
-        bgm.currentTime = 0;
-      }
+      resetGame();
     } else if (player.onGround) {
       player.vy = JUMP_STRENGTH;
     } else if (player.canDoubleJump) {
@@ -391,11 +403,49 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ===== 初期化とゲーム開始 =====
+// ===== キャンバスリサイズ =====
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
+  // 足場再配置
+  const groundY = canvas.height - 100;
+  if (gameState === "play") {
+    player.y = groundY - player.height;
+  }
+  initPlatforms();
 }
+
+function isMobile() {
+  return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
+}
+
+
+// --- タッチボタンのイベント追加 ---
+document.getElementById("jumpBtn").addEventListener("touchstart", function(e) {
+  e.preventDefault();
+  // ゲームオーバー/スタート時はリセット
+  if (gameState === "start" || gameState === "over") {
+    resetGame();
+    return;
+  }
+  // プレイ中はジャンプ
+  if (gameState === "play" && (player.onGround || player.canDoubleJump)) {
+    if (player.onGround) {
+      player.vy = JUMP_STRENGTH;
+      // jumpSoundがあればここで鳴らす
+    } else if (player.canDoubleJump) {
+      player.vy = JUMP_STRENGTH;
+      player.canDoubleJump = false;
+      // jumpSoundがあればここで鳴らす
+    }
+  }
+});
+
+document.getElementById("boostBtn").addEventListener("touchstart", function(e) {
+  e.preventDefault();
+  boostFrames = 15;
+});
 
 //これがメイン関数といえるところ
 window.addEventListener("resize", resizeCanvas);//ウィンドウの大きさが変わったときに自動的に実行する
