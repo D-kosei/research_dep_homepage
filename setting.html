@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <title>チャリ走 設定</title>
   <link rel="stylesheet" href="css/setting.css">
+  <script src="js/setting.js" defer></script>
 </head>
 <body>
   <div class="container">
     <h1>設定</h1>
-    <form>
+    <form id="setting-form">
       <div class="setting-item">
         <label for="bgm-toggle">BGM：</label>
         <select id="bgm-toggle">
@@ -20,10 +21,9 @@
         <label for="difficulty">難易度：</label>
         <select id="difficulty">
           <option value="easy">かんたん</option>
-          <option value="normal" selected>ふつう</option>
+          <option value="normal">ふつう</option>
           <option value="hard">むずかしい</option>
         </select>
-        
       </div>
       <div class="setting-item">
         <label for="speed">ゲーム速度：</label>
@@ -34,6 +34,9 @@
         <a href="index.html" class="back-btn">トップに戻る</a>
       </div>
     </form>
+    <div id="save-message" style="text-align:center; color:#2980b9; margin-top:16px; display:none;">
+      保存しました！
+    </div>
   </div>
 </body>
 </html>
