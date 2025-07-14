@@ -40,9 +40,24 @@ const JUMP_STRENGTH = -12;               // ジャンプ時の初速度
 const BASE_SCROLL_SPEED = 3;             // 通常の横スクロール速度
 let scrollSpeed = BASE_SCROLL_SPEED;     // 現在のスクロール速度（加速対応）
 
+// キャラクター画像のパスを設定
+function getCharacterImagePath() {
+  const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
+  switch (settings.character) {
+    case 'elephant':
+      return "img/elephant.png";
+    case 'horse':
+      return "img/horse.png";
+    case 'cheetah':
+      return "img/cheetah.png";
+    default:
+      return "img/bike.png";
+  }
+}
+
 // プレイヤー用画像の読み込み
-const bikeImg = new Image();
-bikeImg.src = "img/bike.png";  // 画像のパス
+let characterImg = new Image();
+characterImg.src = getCharacterImagePath();
 
 // ===== ゲーム状態管理 =====
 let playStartTime = 0;                    // ゲーム開始時刻（ミリ秒）
@@ -51,7 +66,6 @@ let score = 0;                            // スコアカウント
 let showStartText = false;               // 「スタート！」表示のフラグ
 let startTextTimer = 0;                  // 表示タイマー
 let boostFrames = 0;                     // 加速持続フレーム（Shiftキー）
-
 
 // ===== プレイヤーオブジェクト =====
 const player = {
@@ -261,13 +275,34 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // プレイヤー
-  if (bikeImg.complete) {
-  ctx.drawImage(bikeImg, player.x, player.y, player.width, player.height);
-} else {
-  // 画像読み込み前は赤い四角
-  ctx.fillStyle = "red";
-  ctx.fillRect(player.x, player.y, player.width, player.height);
-}
+  let drawW = player.width;
+  let drawH = player.height;
+  let offsetY = 0;
+  const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
+  // 大きさの調整
+  if (settings.character && settings.character === "horse") {
+    drawW = player.width * 1.3;
+    drawH = player.height * 1.3;
+  } else if (settings.character === "elephant" || settings.character === "cheetah") {
+    drawW = player.width * 2;
+    drawH = player.height * 2.3;
+    if (settings.character === "elephant") {
+      offsetY = drawH * 0.12; // 下に12%分浮かせる
+    }
+  }
+  if (characterImg.complete) {
+    ctx.drawImage(
+      characterImg,
+      player.x - (drawW - player.width) / 2,
+      player.y - (drawH - player.height) / 2,
+      drawW,
+      drawH
+    );
+  } else {
+    ctx.fillStyle = "red";
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+  }
+
 
   // 足場
   ctx.fillStyle = "green";
@@ -322,7 +357,10 @@ function gameLoop() {
 document.addEventListener("keydown", (e) => {
   if (e.code === "Space") {
     if (gameState === "start" || gameState === "over") {
-    playStartTime = Date.now();
+      // キャラクター画像を再設定
+      characterImg.src = getCharacterImagePath();
+      // ゲーム初期化処理
+      playStartTime = Date.now();
       gameState = "play";
       player.y = canvas.height - 100 - player.height;
       player.vy = 0;
@@ -332,7 +370,8 @@ document.addEventListener("keydown", (e) => {
       showStartText = true;
       startTextTimer = 60;
       initPlatforms();
-       // ここでBGMのON/OFF判定
+
+      // ここでBGMのON/OFF判定
       const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
       if (settings.bgm === "on") {
         bgm.currentTime = 0;
