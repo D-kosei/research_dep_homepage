@@ -1,3 +1,31 @@
+// --- game.jsの先頭（たとえばBGMや定数のすぐ下など）に追加 ---
+// ランキングデータの管理
+class RankingManager {
+    constructor() {
+        this.STORAGE_KEY = 'charider_scores';
+        this.MAX_SCORES = 10;
+    }
+    saveScore(score) {
+        const scores = this.getScores();
+        const newScore = {
+            score: score,
+            date: new Date().toLocaleString()
+        };
+        scores.push(newScore);
+        scores.sort((a, b) => b.score - a.score);
+        const topScores = scores.slice(0, this.MAX_SCORES);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(topScores));
+    }
+    getScores() {
+        const scoresJson = localStorage.getItem(this.STORAGE_KEY);
+        return scoresJson ? JSON.parse(scoresJson) : [];
+    }
+}
+// -------------------------------------------
+
+const rankingManager = new RankingManager();
+
+
 // ===== キャンバス設定 =====
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -28,7 +56,7 @@ let boostFrames = 0;                     // 加速持続フレーム（Shiftキ�
 // ===== プレイヤーオブジェクト =====
 const player = {
   x: 100,
-  y: canvas.height - 30, // 足場の上に設置
+  y: canvas.height - 62, // 足場の上に設置
   width: 100,
   height: 100,
   vy: 0,
@@ -110,6 +138,7 @@ function updateObstacles() {
     ) {
       gameState = "over";
       bgm.pause(); // BGMを一時停止
+      rankingManager.saveScore(score);
     }
 
     // 画面外へ出たら削除
@@ -215,12 +244,14 @@ function update() {
   if (checkSpikeCollision(player)) {
     gameState = "over";
     bgm.pause(); // BGMを一時停止
+    rankingManager.saveScore(score);
   }
 
   // 画面外（下）に落ちたらゲームオーバー
   if (player.y > canvas.height) {
     gameState = "over";
     bgm.pause(); // BGMを一時停止
+    rankingManager.saveScore(score);
   }
 }
 
