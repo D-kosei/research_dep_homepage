@@ -2,7 +2,7 @@
 class RankingManager {
     constructor() {
         this.STORAGE_KEY = 'charider_scores';
-        this.MAX_SCORES = 10; // 保存するスコアの最大数
+        this.MAX_SCORES = 8; // 保存するスコアの最大数
     }
 
     // スコアを保存
