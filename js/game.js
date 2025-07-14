@@ -2,6 +2,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// ===== サウンド読み込み（BGM） =====
+const bgm = new Audio("bgm/bgm.mp3");      // 背景音楽（ループ）
+bgm.loop = true;
+
 // ===== ゲーム定数 =====
 const GRAVITY = 0.5;                      // 重力加速度
 const JUMP_STRENGTH = -12;               // ジャンプ時の初速度
@@ -100,6 +104,7 @@ function updateObstacles() {
     player.y + player.height > ob.y - ob.size * 0.5
     ) {
       gameState = "over";
+      bgm.pause(); // BGMを一時停止
     }
 
     // 画面外へ出たら削除
@@ -204,11 +209,13 @@ function update() {
   // スパイク（障害物）との当たり判定（当たればゲームオーバー）
   if (checkSpikeCollision(player)) {
     gameState = "over";
+    bgm.pause(); // BGMを一時停止
   }
 
   // 画面外（下）に落ちたらゲームオーバー
   if (player.y > canvas.height) {
     gameState = "over";
+    bgm.pause(); // BGMを一時停止
   }
 }
 
@@ -282,6 +289,7 @@ document.addEventListener("keydown", (e) => {
       showStartText = true;
       startTextTimer = 60;
       initPlatforms();
+      bgm.play(); // BGM再生
     } else if (player.onGround) {
       player.vy = JUMP_STRENGTH;
     } else if (player.canDoubleJump) {
