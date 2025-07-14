@@ -10,8 +10,17 @@
 </head>
 <body>
   <!-- ゲーム描画キャンバス。CSSで画面中央に配置されます -->
-  <canvas id="gameCanvas" width="960" height="540"></canvas>
-
+  <canvas id="gameCanvas"></canvas>
+  
   <a href="index.html" id="home-btn" style="position: absolute; top: 20px; right: 20px; z-index: 10; background: #3271dd; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-size: 18px; transition: background 0.2s;">ゲームをやめる</a>
+
+  <!-- スマホ用操作ボタン -->
+<div id="halfBoostBtn">
+  <button id="boostBtn">加速</button>
+</div>
+<div id="halfJumpBtn">
+  <button id="jumpBtn">ジャンプ</button>
+</div>
+  
 </body>
 </html>
