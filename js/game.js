@@ -251,11 +251,13 @@ function draw() {
   ctx.fillText(`Score: ${score}`, 10, 30);
 
   // 状態メッセージ
+  ctx.textAlign = "center"; // 中央揃え
   if (gameState === "start") {
-    ctx.fillText("スペースキーでスタート", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.fillText("スペースキーでスタート", canvas.width / 2 , canvas.height / 2);
   } else if (gameState === "over") {
-    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", canvas.width / 2 , canvas.height / 2);
   }
+  ctx.textAlign = "left"; // スコアは左揃え
 
   if (showStartText && startTextTimer > 0) {
     ctx.fillStyle = "yellow";
