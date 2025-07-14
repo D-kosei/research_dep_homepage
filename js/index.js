@@ -1,5 +1,5 @@
-const img = document.getElementById('move-img');
-const board = document.querySelector('.board');
+const img = document.getElementById('move-img');//画像を取得
+const board = document.querySelector('.board');//ボードを取得
 const imgWidth = img.offsetWidth;
 const boardWidth = board.offsetWidth;
 

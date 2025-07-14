@@ -19,7 +19,7 @@ let boostFrames = 0;                     // 加速持続フレーム（Shiftキ�
 // ===== プレイヤーオブジェクト =====
 const player = {
   x: 100,
-  y: canvas.height - 140, // 足場の上に設置
+  y: canvas.height - 30, // 足場の上に設置
   width: 60,
   height: 60,
   vy: 0,
@@ -35,23 +35,23 @@ const platformHeight = 40;
 
 // 初期足場の生成
 function initPlatforms() {
-  platforms.length = 0;
-  const groundY = canvas.height - 100;
-  for (let i = 0; i < 8; i++) {
+  platforms.length = 0;//配列を空にする
+  const groundY = canvas.height - 100;//画面の下から100px上の場所に足場を配置する
+  for (let i = 0; i < 8; i++) {//この8は適当らしい
     platforms.push({
       x: i * platformWidth,
       y: groundY,
-      hasSpike: false
+      hasSpike: false//とげをつくる
     });
   }
 }
 
 // 足場の再生成（無限生成）
 function regeneratePlatforms() {
-  if (platforms[0].x + platformWidth < 0) {
-    platforms.shift();
-    const lastX = platforms[platforms.length - 1].x;
-    const gap = Math.random() < 0.3 ? 60 : 0;
+  if (platforms[0].x + platformWidth < 0) {//今いる足場が画面から出たら
+    platforms.shift();//配列の最初をなくす、使わなくなった足場のデータを消す
+    const lastX = platforms[platforms.length - 1].x;//今生成されている足場の一番右のｘ座標を取得
+    const gap = Math.random() < 0.3 ? 100 : 0;//足場に穴を作るかどうか
     const groundY = canvas.height - 100;
     const newY = groundY + (Math.random() < 0.2 ? -60 : 0);
     const now = Date.now();
@@ -64,10 +64,7 @@ function regeneratePlatforms() {
     score++;
   }
 };
-    score++;
 
-    score++;
-  
 
 
 // ランダムに隕石（障害物）を生成
@@ -272,7 +269,9 @@ function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-initPlatforms();
-gameLoop();
+
+//これがメイン関数といえるところ
+window.addEventListener("resize", resizeCanvas);//ウィンドウの大きさが変わったときに自動的に実行する
+resizeCanvas();//これはページを開いたときに実行される
+initPlatforms();//足場を初期化する
+gameLoop(); //ゲームが動き続ける
