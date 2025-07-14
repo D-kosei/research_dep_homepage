@@ -25,7 +25,7 @@ const player = {
   vy: 0,
   onGround: true,
   canDoubleJump: true
-};;
+};
 
 // ===== 足場・障害物の管理 =====
 const platforms = [];
@@ -52,14 +52,14 @@ function regeneratePlatforms() {
     platforms.shift();//配列の最初をなくす、使わなくなった足場のデータを消す
     const lastX = platforms[platforms.length - 1].x;//今生成されている足場の一番右のｘ座標を取得
     const gap = Math.random() < 0.3 ? 100 : 0;//足場に穴を作るかどうか
-    const groundY = canvas.height - 100;
+    const groundY = canvas.height - 100;//画面の下から100px上の場所に足場を配置する
     const newY = groundY + (Math.random() < 0.2 ? -60 : 0);
-    const now = Date.now();
-    const elapsed = now - playStartTime;
+    const now = Date.now();//現在の時刻
+    const elapsed = now - playStartTime;//経過時間
     platforms.push({
       x: lastX + platformWidth + gap,
       y: newY,
-      hasSpike: elapsed >= 5000 ? Math.random() < 0.3 : false
+      hasSpike: elapsed >= 5000 ? Math.random() < 0.3 : false//とげの生成（開始5秒から生成する）
     });
     score++;
   }
@@ -82,9 +82,14 @@ function spawnObstacle() {
 
 // 障害物の更新・当たり判定
 function updateObstacles() {
+  // 経過時間を取得
+  const elapsed = Date.now() - playStartTime;
+  // 例えば10秒ごとに+1（落下速度の増加量は調整可）
+  const fallSpeedUp = Math.floor(elapsed / 10000);
+
   for (let i = obstacles.length - 1; i >= 0; i--) {
     const ob = obstacles[i];
-    ob.y += ob.vy;
+    ob.y += ob.vy + fallSpeedUp;;
     ob.x -= scrollSpeed;
 
     // プレイヤーとの衝突判定
@@ -144,45 +149,69 @@ function drawSpikes() {
 
 // ===== ゲーム状態更新処理 =====
 function update() {
+  // ゲーム中でなければ何もしない
   if (gameState !== "play") return;
 
-  scrollSpeed = boostFrames > 0 ? BASE_SCROLL_SPEED + 2 : BASE_SCROLL_SPEED;
+  // 経過時間を取得
+  const elapsed = Date.now() - playStartTime;
+
+  // スクロール速度を経過時間で増加させる（例：10秒ごとに+1）
+  scrollSpeed = BASE_SCROLL_SPEED + Math.floor(elapsed / 10000);
+
+  // ブースト中はさらに加速
+  if (boostFrames > 0) scrollSpeed += 2;
   if (boostFrames > 0) boostFrames--;
 
+
+  // プレイヤーの落下速度に重力を加算
   player.vy += GRAVITY;
+  // プレイヤーのy座標を移動
   player.y += player.vy;
+  // 地面についていない状態に初期化
   player.onGround = false;
 
+  // すべての足場とプレイヤーの当たり判定
   for (const pf of platforms) {
     if (
-      player.x + player.width > pf.x &&
-      player.x < pf.x + platformWidth &&
-      player.y + player.height >= pf.y &&
-      player.y + player.height <= pf.y + platformHeight
+      player.x + player.width > pf.x &&                   // プレイヤーの右端が足場の左端より右
+      player.x < pf.x + platformWidth &&                  // プレイヤーの左端が足場の右端より左
+      player.y + player.height >= pf.y &&                 // プレイヤーの底面が足場の上より下
+      player.y + player.height <= pf.y + platformHeight   // プレイヤーの底面が足場の底より上
     ) {
+      // プレイヤーを足場の上に乗せる
       player.y = pf.y - player.height;
+      // 落下速度をリセット
       player.vy = 0;
+      // 地面にいる状態に
       player.onGround = true;
+      // ダブルジャンプをリセット
       player.canDoubleJump = true;
     }
   }
 
+  // 足場を全体的に左へ移動（スクロール）
   for (const pf of platforms) {
     pf.x -= scrollSpeed;
   }
 
+  // 必要なら新しい足場を生成（無限スクロール）
   regeneratePlatforms();
+  // 一定確率で新たな障害物を生成
   spawnObstacle();
+  // 既存の障害物の位置を更新＆当たり判定
   updateObstacles();
 
+  // スパイク（障害物）との当たり判定（当たればゲームオーバー）
   if (checkSpikeCollision(player)) {
     gameState = "over";
   }
 
+  // 画面外（下）に落ちたらゲームオーバー
   if (player.y > canvas.height) {
     gameState = "over";
   }
 }
+
 
 // ===== 描画処理 =====
 function draw() {
@@ -216,9 +245,9 @@ function draw() {
 
   // 状態メッセージ
   if (gameState === "start") {
-    ctx.fillText("スペースキーでスタート", 200, 150);
+    ctx.fillText("スペースキーでスタート", canvas.width / 2 - 100, canvas.height / 2);
   } else if (gameState === "over") {
-    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", 150, 180);
+    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", canvas.width / 2 - 100, canvas.height / 2);
   }
 
   if (showStartText && startTextTimer > 0) {
@@ -245,7 +274,7 @@ document.addEventListener("keydown", (e) => {
     if (gameState === "start" || gameState === "over") {
     playStartTime = Date.now();
       gameState = "play";
-      player.y = 280;
+      player.y = canvas.height - 100 - player.height;
       player.vy = 0;
       player.canDoubleJump = true;
       score = 0;
