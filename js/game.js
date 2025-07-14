@@ -332,7 +332,15 @@ document.addEventListener("keydown", (e) => {
       showStartText = true;
       startTextTimer = 60;
       initPlatforms();
-      bgm.play(); // BGM再生
+       // ここでBGMのON/OFF判定
+      const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
+      if (settings.bgm === "on") {
+        bgm.currentTime = 0;
+        bgm.play();
+      } else {
+        bgm.pause();
+        bgm.currentTime = 0;
+      }
     } else if (player.onGround) {
       player.vy = JUMP_STRENGTH;
     } else if (player.canDoubleJump) {
