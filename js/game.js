@@ -88,7 +88,7 @@ function regeneratePlatforms() {
   if (platforms[0].x + platformWidth < 0) {//今いる足場が画面から出たら
     platforms.shift();//配列の最初をなくす、使わなくなった足場のデータを消す
     const lastX = platforms[platforms.length - 1].x;//今生成されている足場の一番右のｘ座標を取得
-    const gap = Math.random() < 0.3 ? 100 : 0;//足場に穴を作るかどうか
+    const gap = Math.random() < 0.3 ? 150 : 0;//足場に穴を作るかどうか
     const groundY = canvas.height - 100;//画面の下から100px上の場所に足場を配置する
     const newY = groundY + (Math.random() < 0.2 ? -60 : 0);
     const now = Date.now();//現在の時刻
