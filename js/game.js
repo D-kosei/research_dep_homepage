@@ -2,11 +2,19 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// ===== サウンド読み込み（BGM） =====
+const bgm = new Audio("bgm/bgm.mp3");      // 背景音楽（ループ）
+bgm.loop = true;
+
 // ===== ゲーム定数 =====
 const GRAVITY = 0.5;                      // 重力加速度
 const JUMP_STRENGTH = -12;               // ジャンプ時の初速度
 const BASE_SCROLL_SPEED = 3;             // 通常の横スクロール速度
 let scrollSpeed = BASE_SCROLL_SPEED;     // 現在のスクロール速度（加速対応）
+
+// プレイヤー用画像の読み込み
+const bikeImg = new Image();
+bikeImg.src = "img/bike.png";  // 画像のパス
 
 // ===== ゲーム状態管理 =====
 let playStartTime = 0;                    // ゲーム開始時刻（ミリ秒）
@@ -16,12 +24,13 @@ let showStartText = false;               // 「スタート！」表示のフラ
 let startTextTimer = 0;                  // 表示タイマー
 let boostFrames = 0;                     // 加速持続フレーム（Shiftキー）
 
+
 // ===== プレイヤーオブジェクト =====
 const player = {
   x: 100,
   y: canvas.height - 30, // 足場の上に設置
-  width: 60,
-  height: 60,
+  width: 100,
+  height: 100,
   vy: 0,
   onGround: true,
   canDoubleJump: true
@@ -94,12 +103,13 @@ function updateObstacles() {
 
     // プレイヤーとの衝突判定
     if (
-    player.x < ob.x + ob.size * 0.5 &&
-    player.x + player.width > ob.x - ob.size * 0.5 &&
-    player.y < ob.y + ob.size * 0.5 &&
-    player.y + player.height > ob.y - ob.size * 0.5
+    player.x + player.width * 0.3 < ob.x + ob.size * 0.4 &&
+    player.x + player.width > ob.x - ob.size * 0.4 &&
+    player.y < ob.y + ob.size * 0.4 &&
+    player.y + player.height > ob.y - ob.size * 0.4
     ) {
       gameState = "over";
+      bgm.pause(); // BGMを一時停止
     }
 
     // 画面外へ出たら削除
@@ -204,11 +214,13 @@ function update() {
   // スパイク（障害物）との当たり判定（当たればゲームオーバー）
   if (checkSpikeCollision(player)) {
     gameState = "over";
+    bgm.pause(); // BGMを一時停止
   }
 
   // 画面外（下）に落ちたらゲームオーバー
   if (player.y > canvas.height) {
     gameState = "over";
+    bgm.pause(); // BGMを一時停止
   }
 }
 
@@ -218,8 +230,13 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // プレイヤー
+  if (bikeImg.complete) {
+  ctx.drawImage(bikeImg, player.x, player.y, player.width, player.height);
+} else {
+  // 画像読み込み前は赤い四角
   ctx.fillStyle = "red";
   ctx.fillRect(player.x, player.y, player.width, player.height);
+}
 
   // 足場
   ctx.fillStyle = "green";
@@ -244,11 +261,13 @@ function draw() {
   ctx.fillText(`Score: ${score}`, 10, 30);
 
   // 状態メッセージ
+  ctx.textAlign = "center"; // 中央揃え
   if (gameState === "start") {
-    ctx.fillText("スペースキーでスタート", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.fillText("スペースキーでスタート", canvas.width / 2 , canvas.height / 2);
   } else if (gameState === "over") {
-    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.fillText("ゲームオーバー！スペースキーで再挑戦", canvas.width / 2 , canvas.height / 2);
   }
+  ctx.textAlign = "left"; // スコアは左揃え
 
   if (showStartText && startTextTimer > 0) {
     ctx.fillStyle = "yellow";
@@ -282,6 +301,7 @@ document.addEventListener("keydown", (e) => {
       showStartText = true;
       startTextTimer = 60;
       initPlatforms();
+      bgm.play(); // BGM再生
     } else if (player.onGround) {
       player.vy = JUMP_STRENGTH;
     } else if (player.canDoubleJump) {
