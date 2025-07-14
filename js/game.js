@@ -12,6 +12,10 @@ const JUMP_STRENGTH = -12;               // ジャンプ時の初速度
 const BASE_SCROLL_SPEED = 3;             // 通常の横スクロール速度
 let scrollSpeed = BASE_SCROLL_SPEED;     // 現在のスクロール速度（加速対応）
 
+// プレイヤー用画像の読み込み
+const bikeImg = new Image();
+bikeImg.src = "img/bike.png";  // 画像のパス
+
 // ===== ゲーム状態管理 =====
 let playStartTime = 0;                    // ゲーム開始時刻（ミリ秒）
 let gameState = "start";                 // "start" | "play" | "over"
@@ -20,12 +24,13 @@ let showStartText = false;               // 「スタート！」表示のフラ
 let startTextTimer = 0;                  // 表示タイマー
 let boostFrames = 0;                     // 加速持続フレーム（Shiftキー）
 
+
 // ===== プレイヤーオブジェクト =====
 const player = {
   x: 100,
   y: canvas.height - 30, // 足場の上に設置
-  width: 60,
-  height: 60,
+  width: 100,
+  height: 100,
   vy: 0,
   onGround: true,
   canDoubleJump: true
@@ -98,10 +103,10 @@ function updateObstacles() {
 
     // プレイヤーとの衝突判定
     if (
-    player.x < ob.x + ob.size * 0.5 &&
-    player.x + player.width > ob.x - ob.size * 0.5 &&
-    player.y < ob.y + ob.size * 0.5 &&
-    player.y + player.height > ob.y - ob.size * 0.5
+    player.x + player.width * 0.3 < ob.x + ob.size * 0.4 &&
+    player.x + player.width > ob.x - ob.size * 0.4 &&
+    player.y < ob.y + ob.size * 0.4 &&
+    player.y + player.height > ob.y - ob.size * 0.4
     ) {
       gameState = "over";
       bgm.pause(); // BGMを一時停止
@@ -225,8 +230,13 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // プレイヤー
+  if (bikeImg.complete) {
+  ctx.drawImage(bikeImg, player.x, player.y, player.width, player.height);
+} else {
+  // 画像読み込み前は赤い四角
   ctx.fillStyle = "red";
   ctx.fillRect(player.x, player.y, player.width, player.height);
+}
 
   // 足場
   ctx.fillStyle = "green";
