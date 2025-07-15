@@ -1,16 +1,25 @@
 /* 全体 */
 body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* ←縦中央 */
+  align-items: center;      /* ←横中央 */
+  min-height: 100vh;        /* 画面全体高さを確保 */
   margin: 0;
   background: radial-gradient(#ffffff, #3271dd);
 }
 
 /* フレーム */
 .frame {
-  margin: 70px auto;
   width: 800px;
+  max-width: 95vw;
+  margin: 70px auto;
   border: 10px solid #0930ae;
   border-radius: 8px;
+  background: #fff;
 }
+
+
 
 /* ボード */
 .board {
@@ -98,28 +107,29 @@ button {
 
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
-  html, body {
-    height: 100vh !important;
-    width: 100vw !important;
-    min-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-  }
-  body {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    width: 100vw !important;
-    overflow: hidden;
-  }
   .frame {
-    margin: 0 !important;
     width: 98vw !important;
     max-width: 420px !important;
-    box-sizing: border-box;
+    min-height: 80vw !important;
+    margin: 0 auto !important;
+    border-width: 5px !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+  }
+  .buttons {
+    width: 90vw !important;
+    gap: 18px !important;
+    font-size: 18px !important;
+    padding: 0;
+  }
+  .title {
+    font-size: 8vw !important;
+    margin-bottom: 26px !important;
+  }
+  button {
+    font-size: 20px !important;
+    min-width: 90px !important;
+    width: 38vw !important;
+    padding: 8px 0 !important;
   }
 }
