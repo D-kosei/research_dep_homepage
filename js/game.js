@@ -422,6 +422,10 @@ function isMobile() {
 
 // 縦画面かどうか判定
 function isPortrait() {
+  if (window.screen.orientation && window.screen.orientation.type) {
+    return window.screen.orientation.type.startsWith('portrait');
+  }
+  // Fallback
   return window.innerHeight > window.innerWidth;
 }
 
@@ -437,6 +441,8 @@ function checkOrientationNotice() {
 // リサイズや向き変化時に実行
 window.addEventListener("resize", checkOrientationNotice);
 window.addEventListener("orientationchange", checkOrientationNotice);
+window.addEventListener("DOMContentLoaded", checkOrientationNotice);
+setTimeout(checkOrientationNotice, 100); // レイアウト確定後にも実行
 // 初期表示でもチェック
 checkOrientationNotice();
 
