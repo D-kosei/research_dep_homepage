@@ -420,6 +420,25 @@ function isMobile() {
   return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
 }
 
+// 縦画面かどうか判定
+function isPortrait() {
+  return window.innerHeight > window.innerWidth;
+}
+
+// 横画面の促し表示の制御
+function checkOrientationNotice() {
+  if (isMobile() && isPortrait()) {
+    document.getElementById('rotateNotice').style.display = "flex";
+  } else {
+    document.getElementById('rotateNotice').style.display = "none";
+  }
+}
+
+// リサイズや向き変化時に実行
+window.addEventListener("resize", checkOrientationNotice);
+window.addEventListener("orientationchange", checkOrientationNotice);
+// 初期表示でもチェック
+checkOrientationNotice();
 
 // --- タッチボタンのイベント追加 ---
 document.getElementById("jumpBtn").addEventListener("touchstart", function(e) {
