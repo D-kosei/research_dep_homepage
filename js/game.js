@@ -375,7 +375,9 @@ function resetGame() {
   showStartText = true;
   startTextTimer = 60;
   initPlatforms();
-
+  if (!localStorage.getItem('charider_settings')) {
+    localStorage.setItem('charider_settings', JSON.stringify({ bgm: "on" }));
+  }
   // ここでBGMのON/OFF判定
   const settings = JSON.parse(localStorage.getItem('charider_settings') || '{}');
   if (settings.bgm === "on") {
